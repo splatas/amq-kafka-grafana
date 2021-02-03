@@ -1,0 +1,303 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+  creationTimestamp: '2020-08-13T20:30:50Z'
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: kafka-cluster
+    app.kubernetes.io/managed-by: strimzi-cluster-operator
+    app.kubernetes.io/name: strimzi
+    app.kubernetes.io/part-of: strimzi-kafka-cluster
+    strimzi.io/cluster: kafka-cluster
+    strimzi.io/kind: Kafka
+    strimzi.io/name: kafka-cluster-entity-operator
+  name: kafka-cluster-entity-operator
+  namespace: amq-kafka-dev
+  ownerReferences:
+    - apiVersion: kafka.strimzi.io/v1beta1
+      blockOwnerDeletion: false
+      controller: false
+      kind: Kafka
+      name: kafka-cluster
+      uid: 1c56e00c-dda3-11ea-a9b2-005056b0841c
+  resourceVersion: '546132884'
+  selfLink: >-
+    /apis/apps/v1/namespaces/amq-kafka-dev/deployments/kafka-cluster-entity-operator
+  uid: e04718d0-dda3-11ea-a9b2-005056b0841c
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      strimzi.io/cluster: kafka-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: kafka-cluster-entity-operator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        strimzi.io/clients-ca-cert-generation: '0'
+        strimzi.io/cluster-ca-cert-generation: '0'
+        strimzi.io/logging: >
+          # Do not change this generated file. Logging can be configured in the
+          corresponding kubernetes/openshift resource.
+
+          name=TOConfig
+
+          appender.console.type=Console
+
+          appender.console.name=STDOUT
+
+          appender.console.layout.type=PatternLayout
+
+          appender.console.layout.pattern=[%d] %-5p <%-12.12c{1}:%L> [%-12.12t]
+          %m%n
+
+          rootLogger.level=INFO
+
+          rootLogger.appenderRefs=stdout
+
+          rootLogger.appenderRef.console.ref=STDOUT
+
+          rootLogger.additivity=false
+
+          # Do not change this generated file. Logging can be configured in the
+          corresponding kubernetes/openshift resource.
+
+          name=UOConfig
+
+          appender.console.type=Console
+
+          appender.console.name=STDOUT
+
+          appender.console.layout.type=PatternLayout
+
+          appender.console.layout.pattern=[%d] %-5p <%-12.12c{1}:%L> [%-12.12t]
+          %m%n
+
+          rootLogger.level=INFO
+
+          rootLogger.appenderRefs=stdout
+
+          rootLogger.appenderRef.console.ref=STDOUT
+
+          rootLogger.additivity=false
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: kafka-cluster
+        app.kubernetes.io/managed-by: strimzi-cluster-operator
+        app.kubernetes.io/name: strimzi
+        app.kubernetes.io/part-of: strimzi-kafka-cluster
+        strimzi.io/cluster: kafka-cluster
+        strimzi.io/kind: Kafka
+        strimzi.io/name: kafka-cluster-entity-operator
+    spec:
+      containers:
+        - args:
+            - /opt/strimzi/bin/topic_operator_run.sh
+          env:
+            - name: STRIMZI_RESOURCE_LABELS
+              value: strimzi.io/cluster=kafka-cluster
+            - name: STRIMZI_KAFKA_BOOTSTRAP_SERVERS
+              value: 'kafka-cluster-kafka-bootstrap:9091'
+            - name: STRIMZI_ZOOKEEPER_CONNECT
+              value: 'localhost:2181'
+            - name: STRIMZI_NAMESPACE
+              value: amq-kafka-dev
+            - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS
+              value: '90000'
+            - name: STRIMZI_ZOOKEEPER_SESSION_TIMEOUT_MS
+              value: '20000'
+            - name: STRIMZI_TOPIC_METADATA_MAX_ATTEMPTS
+              value: '6'
+            - name: STRIMZI_TLS_ENABLED
+              value: 'true'
+            - name: STRIMZI_GC_LOG_ENABLED
+              value: 'false'
+          image: 'registry.redhat.io/amq7/amq-streams-rhel7-operator:1.4.1'
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthy
+              port: healthcheck
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: topic-operator
+          ports:
+            - containerPort: 8080
+              name: healthcheck
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: healthcheck
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/topic-operator/custom-config/
+              name: entity-topic-operator-metrics-and-logging
+            - mountPath: /etc/tls-sidecar/eo-certs/
+              name: eo-certs
+            - mountPath: /etc/tls-sidecar/cluster-ca-certs/
+              name: cluster-ca-certs
+        - args:
+            - /opt/strimzi/bin/user_operator_run.sh
+          env:
+            - name: STRIMZI_ZOOKEEPER_CONNECT
+              value: 'localhost:2181'
+            - name: STRIMZI_NAMESPACE
+              value: amq-kafka-dev
+            - name: STRIMZI_LABELS
+              value: strimzi.io/cluster=kafka-cluster
+            - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS
+              value: '120000'
+            - name: STRIMZI_ZOOKEEPER_SESSION_TIMEOUT_MS
+              value: '6000'
+            - name: STRIMZI_CA_KEY_NAME
+              value: kafka-cluster-clients-ca
+            - name: STRIMZI_CA_CERT_NAME
+              value: kafka-cluster-clients-ca-cert
+            - name: STRIMZI_CA_NAMESPACE
+              value: amq-kafka-dev
+            - name: STRIMZI_CA_VALIDITY
+              value: '365'
+            - name: STRIMZI_CA_RENEWAL
+              value: '30'
+            - name: STRIMZI_GC_LOG_ENABLED
+              value: 'false'
+          image: 'registry.redhat.io/amq7/amq-streams-rhel7-operator:1.4.1'
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthy
+              port: healthcheck
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: user-operator
+          ports:
+            - containerPort: 8081
+              name: healthcheck
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: healthcheck
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/user-operator/custom-config/
+              name: entity-user-operator-metrics-and-logging
+        - command:
+            - /opt/stunnel/entity_operator_stunnel_run.sh
+          env:
+            - name: TLS_SIDECAR_LOG_LEVEL
+              value: notice
+            - name: STRIMZI_ZOOKEEPER_CONNECT
+              value: 'kafka-cluster-zookeeper-client:2181'
+          image: 'registry.redhat.io/amq7/amq-streams-kafka-24-rhel7:1.4.1'
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /opt/stunnel/entity_operator_stunnel_pre_stop.sh
+          livenessProbe:
+            exec:
+              command:
+                - /opt/stunnel/stunnel_healthcheck.sh
+                - '2181'
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: tls-sidecar
+          readinessProbe:
+            exec:
+              command:
+                - /opt/stunnel/stunnel_healthcheck.sh
+                - '2181'
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/tls-sidecar/eo-certs/
+              name: eo-certs
+            - mountPath: /etc/tls-sidecar/cluster-ca-certs/
+              name: cluster-ca-certs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: kafka-cluster-entity-operator
+      serviceAccountName: kafka-cluster-entity-operator
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: kafka-cluster-entity-topic-operator-config
+          name: entity-topic-operator-metrics-and-logging
+        - configMap:
+            defaultMode: 420
+            name: kafka-cluster-entity-user-operator-config
+          name: entity-user-operator-metrics-and-logging
+        - name: eo-certs
+          secret:
+            defaultMode: 288
+            secretName: kafka-cluster-entity-operator-certs
+        - name: cluster-ca-certs
+          secret:
+            defaultMode: 288
+            secretName: kafka-cluster-cluster-ca-cert
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2020-08-13T20:30:50Z'
+      lastUpdateTime: '2020-08-13T20:31:11Z'
+      message: >-
+        ReplicaSet "kafka-cluster-entity-operator-65bb7d577" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2020-12-23T19:41:40Z'
+      lastUpdateTime: '2020-12-23T19:41:40Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
