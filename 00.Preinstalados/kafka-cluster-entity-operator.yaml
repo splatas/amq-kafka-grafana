@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: '1'
-  creationTimestamp: '2020-08-13T20:30:50Z'
   generation: 1
   labels:
     app.kubernetes.io/instance: kafka-cluster
@@ -14,18 +13,12 @@ metadata:
     strimzi.io/kind: Kafka
     strimzi.io/name: kafka-cluster-entity-operator
   name: kafka-cluster-entity-operator
-  namespace: amq-kafka-dev
   ownerReferences:
     - apiVersion: kafka.strimzi.io/v1beta1
       blockOwnerDeletion: false
       controller: false
       kind: Kafka
       name: kafka-cluster
-      uid: 1c56e00c-dda3-11ea-a9b2-005056b0841c
-  resourceVersion: '546132884'
-  selfLink: >-
-    /apis/apps/v1/namespaces/amq-kafka-dev/deployments/kafka-cluster-entity-operator
-  uid: e04718d0-dda3-11ea-a9b2-005056b0841c
 spec:
   progressDeadlineSeconds: 600
   replicas: 1

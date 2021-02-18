@@ -3,15 +3,12 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: '1'
-  creationTimestamp: '2021-02-02T15:10:14Z'
   generation: 1
   labels:
     app: strimzi
   name: grafana
   namespace: amq-kafka-dev
   resourceVersion: '622317241'
-  selfLink: /apis/apps/v1/namespaces/amq-kafka-dev/deployments/grafana
-  uid: c08b1bcb-6568-11eb-a398-005056b0841c
 spec:
   progressDeadlineSeconds: 600
   replicas: 1

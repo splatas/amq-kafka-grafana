@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: '1'
-  creationTimestamp: '2021-02-02T15:36:49Z'
   generation: 1
   labels:
     app.kubernetes.io/instance: kafka-cluster
@@ -23,9 +22,6 @@ metadata:
       name: kafka-cluster
       uid: 1c56e00c-dda3-11ea-a9b2-005056b0841c
   resourceVersion: '622835062'
-  selfLink: >-
-    /apis/apps/v1/namespaces/amq-kafka-dev/deployments/kafka-cluster-kafka-exporter
-  uid: 77681abe-656c-11eb-a398-005056b0841c
 spec:
   progressDeadlineSeconds: 600
   replicas: 1

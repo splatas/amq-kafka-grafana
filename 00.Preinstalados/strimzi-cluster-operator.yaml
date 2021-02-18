@@ -10,7 +10,6 @@ metadata:
   labels:
     app: strimzi
   name: strimzi-cluster-operator
-  namespace: amq-kafka-dev
   resourceVersion: '622348018'
   selfLink: /apis/apps/v1/namespaces/amq-kafka-dev/deployments/strimzi-cluster-operator
   uid: 45f077f9-dda1-11ea-8b5e-005056b01184
