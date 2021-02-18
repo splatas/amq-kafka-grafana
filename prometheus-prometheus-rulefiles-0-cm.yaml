@@ -1,0 +1,277 @@
+apiVersion: v1
+data:
+  amq-kafka-dev-prometheus-k8s-rules.yaml: |
+    groups:
+    - name: kafka
+      rules:
+      - alert: KafkaRunningOutOfSpace
+        annotations:
+          description: There are only {{ $value }} bytes available at {{ $labels.persistentvolumeclaim
+            }} PVC
+          summary: Kafka is running out of free disk space
+        expr: kubelet_volume_stats_available_bytes{kubernetes_pod_name=~"([a-z]+-)+kafka-[0-9]+"}
+          < 5368709120
+        for: 10s
+        labels:
+          severity: warning
+      - alert: UnderReplicatedPartitions
+        annotations:
+          description: There are {{ $value }} under replicated partitions on {{ $labels.kubernetes_pod_name
+            }}
+          summary: Kafka under replicated partitions
+        expr: kafka_server_replicamanager_underreplicatedpartitions > 0
+        for: 10s
+        labels:
+          severity: warning
+      - alert: AbnormalControllerState
+        annotations:
+          description: There are {{ $value }} active controllers in the cluster
+          summary: Kafka abnormal controller state
+        expr: sum(kafka_controller_kafkacontroller_activecontrollercount) != 1
+        for: 10s
+        labels:
+          severity: warning
+      - alert: OfflinePartitions
+        annotations:
+          description: One or more partitions have no leader
+          summary: Kafka offline partitions
+        expr: sum(kafka_controller_kafkacontroller_offlinepartitionscount) > 0
+        for: 10s
+        labels:
+          severity: warning
+      - alert: UnderMinIsrPartitionCount
+        annotations:
+          description: There are {{ $value }} partitions under the min ISR on {{ $labels.kubernetes_pod_name
+            }}
+          summary: Kafka under min ISR partitions
+        expr: kafka_server_replicamanager_underminisrpartitioncount > 0
+        for: 10s
+        labels:
+          severity: warning
+      - alert: OfflineLogDirectoryCount
+        annotations:
+          description: There are {{ $value }} offline log directories on {{ $labels.kubernetes_pod_name
+            }}
+          summary: Kafka offline log directories
+        expr: kafka_log_logmanager_offlinelogdirectorycount > 0
+        for: 10s
+        labels:
+          severity: warning
+      - alert: ScrapeProblem
+        annotations:
+          description: Prometheus was unable to scrape metrics from {{ $labels.kubernetes_pod_name
+            }}/{{ $labels.instance }} for more than 3 minutes
+          summary: Prometheus unable to scrape metrics from {{ $labels.kubernetes_pod_name
+            }}/{{ $labels.instance }}
+        expr: up{job="kubernetes-services",kubernetes_namespace!~"openshift-.+",kubernetes_pod_name=~".+-kafka-[0-9]+"}
+          == 0
+        for: 3m
+        labels:
+          severity: major
+      - alert: ClusterOperatorContainerDown
+        annotations:
+          description: The Cluster Operator has been down for longer than 90 seconds
+          summary: Cluster Operator down
+        expr: count((container_last_seen{container_name="strimzi-cluster-operator"} >
+          (time() - 90))) < 1 or absent(container_last_seen{container_name="strimzi-cluster-operator"})
+        for: 1m
+        labels:
+          severity: major
+      - alert: KafkaBrokerContainersDown
+        annotations:
+          description: All `kafka` containers have been down or in CrashLookBackOff status
+            for 3 minutes
+          summary: All `kafka` containers down or in CrashLookBackOff status
+        expr: absent(container_last_seen{container_name="kafka",kubernetes_pod_name=~".+-kafka-[0-9]+"})
+        for: 3m
+        labels:
+          severity: major
+      - alert: KafkaTlsSidecarContainersDown
+        annotations:
+          description: All `tls-sidecar` containers in the Kafka pods are down or in CrashLookBackOff
+            status for 3 minutes
+          summary: All `tls-sidecar` containers in the Kafka pods are down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="tls-sidecar",kubernetes_pod_name=~".+-kafka-[0-9]+"})
+        for: 3m
+        labels:
+          severity: major
+      - alert: KafkaContainerRestartedInTheLast5Minutes
+        annotations:
+          description: One or more Kafka containers were restarted too often within the
+            last 5 minutes
+          summary: One or more Kafka containers restarted too often
+        expr: count(count_over_time(container_last_seen{container_name="kafka"}[5m]))
+          > 2 * count(container_last_seen{container_name="kafka",kubernetes_pod_name=~".+-kafka-[0-9]+"})
+        for: 5m
+        labels:
+          severity: warning
+    - name: zookeeper
+      rules:
+      - alert: AvgRequestLatency
+        annotations:
+          description: The average request latency is {{ $value }} on {{ $labels.kubernetes_pod_name
+            }}
+          summary: Zookeeper average request latency
+        expr: zookeeper_avgrequestlatency > 10
+        for: 10s
+        labels:
+          severity: warning
+      - alert: OutstandingRequests
+        annotations:
+          description: There are {{ $value }} outstanding requests on {{ $labels.kubernetes_pod_name
+            }}
+          summary: Zookeeper outstanding requests
+        expr: zookeeper_outstandingrequests > 10
+        for: 10s
+        labels:
+          severity: warning
+      - alert: ZookeeperRunningOutOfSpace
+        annotations:
+          description: There are only {{ $value }} bytes available at {{ $labels.persistentvolumeclaim
+            }} PVC
+          summary: Zookeeper is running out of free disk space
+        expr: kubelet_volume_stats_available_bytes{kubernetes_pod_name=~"([a-z]+-)+zookeeper-[0-9]+"}
+          < 5368709120
+        for: 10s
+        labels:
+          severity: warning
+      - alert: ZookeeperContainerRestartedInTheLast5Minutes
+        annotations:
+          description: One or more Zookeeper containers were restarted too often within
+            the last 5 minutes. This alert can be ignored when the Zookeeper cluster is
+            scaling up
+          summary: One or more Zookeeper containers were restarted too often
+        expr: count(count_over_time(container_last_seen{container_name="zookeeper"}[5m]))
+          > 2 * count(container_last_seen{container_name="zookeeper",kubernetes_pod_name=~".+-zookeeper-[0-9]+"})
+        for: 5m
+        labels:
+          severity: warning
+      - alert: ZookeeperContainersDown
+        annotations:
+          description: All `zookeeper` containers in the Zookeeper pods have been down
+            or in CrashLookBackOff status for 3 minutes
+          summary: All `zookeeper` containers in the Zookeeper pods down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="zookeeper",kubernetes_pod_name=~".+-zookeeper-[0-9]+"})
+        for: 3m
+        labels:
+          severity: major
+      - alert: ZookeeperTlsSidecarContainersDown
+        annotations:
+          description: All `tls-sidecar` containers in the Zookeeper pods have been down
+            or in CrashLookBackOff status for 3 minutes
+          summary: All `tls-sidecar` containers in the Zookeeper pods down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="tls-sidecar",kubernetes_pod_name=~".+-zookeeper-[0-9]+"})
+        for: 3m
+        labels:
+          severity: major
+    - name: entityOperator
+      rules:
+      - alert: TopicOperatorContainerDown
+        annotations:
+          description: Container topic-operator in Entity Operator pod has been or in
+            CrashLookBackOff status for 3 minutes
+          summary: Container topic-operator in Entity Operator pod down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="topic-operator",kubernetes_pod_name=~".+-entity-operator-.+"})
+        for: 3m
+        labels:
+          severity: major
+      - alert: UserOperatorContainerDown
+        annotations:
+          description: Container user-operator in Entity Operator pod have been down or
+            in CrashLookBackOff status for 3 minutes
+          summary: Container user-operator in Entity Operator pod down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="user-operator",kubernetes_pod_name=~".+-entity-operator-.+"})
+        for: 3m
+        labels:
+          severity: major
+      - alert: EntityOperatorTlsSidecarContainerDown
+        annotations:
+          description: Container tls-sidecar in Entity Operator pod have been down or
+            in CrashLookBackOff status for 3 minutes
+          summary: Container tls-sidecar Entity Operator pod down or in CrashLookBackOff
+            status
+        expr: absent(container_last_seen{container_name="tls-sidecar",kubernetes_pod_name=~".+-entity-operator-.+"})
+        for: 3m
+        labels:
+          severity: major
+    - name: connect
+      rules:
+      - alert: ConnectContainersDown
+        annotations:
+          description: All Kafka Connect containers have been down or in CrashLookBackOff
+            status for 3 minutes
+          summary: All Kafka Connect containers down or in CrashLookBackOff status
+        expr: absent(container_last_seen{container_name=~".+-connect",kubernetes_pod_name=~".+-connect-.+"})
+        for: 3m
+        labels:
+          severity: major
+    - name: bridge
+      rules:
+      - alert: BridgeContainersDown
+        annotations:
+          description: All Kafka Bridge containers have been down or in CrashLookBackOff
+            status for 3 minutes
+          summary: All Kafka Bridge containers down or in CrashLookBackOff status
+        expr: absent(container_last_seen{container_name=~".+-bridge",kubernetes_pod_name=~".+-bridge-.+"})
+        for: 3m
+        labels:
+          severity: major
+    - name: mirrorMaker
+      rules:
+      - alert: MirrorMakerContainerDown
+        annotations:
+          description: All Kafka Mirror Maker containers have been down or in CrashLookBackOff
+            status for 3 minutes
+          summary: All Kafka Mirror Maker containers down or in CrashLookBackOff status
+        expr: absent(container_last_seen{container_name=~".+-mirror-maker",kubernetes_pod_name=~".+-mirror-maker-.+"})
+        for: 3m
+        labels:
+          severity: major
+    - name: kafkaExporter
+      rules:
+      - alert: UnderReplicatedPartition
+        annotations:
+          description: Topic  {{ $labels.topic }} has {{ $value }} under-replicated partition
+            {{ $labels.partition }}
+          summary: Topic has under-replicated partitions
+        expr: kafka_topic_partition_under_replicated_partition > 0
+        for: 10s
+        labels:
+          severity: warning
+      - alert: TooLargeConsumerGroupLag
+        annotations:
+          description: Consumer group {{ $labels.consumergroup}} lag is too big ({{ $value
+            }}) on topic {{ $labels.topic }}/partition {{ $labels.partition }}
+          summary: Consumer group lag is too big
+        expr: kafka_consumergroup_lag > 1000
+        for: 10s
+        labels:
+          severity: warning
+      - alert: NoMessageForTooLong
+        annotations:
+          description: There is no messages in topic {{ $labels.topic}}/partition {{ $labels.partition
+            }} for 10 minutes
+          summary: No message for 10 minutes
+        expr: changes(kafka_topic_partition_current_offset{topic!="__consumer_offsets"}[10m])
+          == 0
+        for: 10s
+        labels:
+          severity: warning
+kind: ConfigMap
+metadata:
+  labels:
+    managed-by: prometheus-operator
+    prometheus-name: prometheus
+  name: prometheus-prometheus-rulefiles-0
+  ownerReferences:
+  - apiVersion: monitoring.coreos.com/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Prometheus
+    name: prometheus
+    uid: 536a4215-623d-11eb-a398-005056b0841c

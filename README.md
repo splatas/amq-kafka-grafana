@@ -20,7 +20,14 @@ Antes de la instalación de Prometheus y Grafana se encontraban instalados los s
         a. oc create -f secret-prometheus-dockercfg.yaml -n namespace (amq-kafka-test)
         b. oc create -f secret-prometheus-token.yaml -n namespace (amq-kafka-test)
     
-
+2.2. prometheus-prometheus-statefulset.yaml
+    oc create -f prometheus-prometheus-statefulset.yaml -n namespace (amq-kafka-test)
+    Lo crea pero no deploya porque necesita la serviceaccount 'prometheus-server'
+        a. oc create -f prometheus-server-sa.yaml -n namespace (amq-kafka-test)
+        b. oc create -f prometheus-prometheus-rulefiles-0-cm.yaml -n namespace (amq-kafka-test)
+        c. oc create -f prometheus-prometheus-secret.yaml -n namespace (amq-kafka-test)
+        d. oc create -f prometheus-svc.yaml -n namespace (amq-kafka-test)
+        d. oc create -f prometheus-route.yaml -n namespace (amq-kafka-test)
 
 2.2. grafana.yaml
 2.3. kafka-cluster-kafka-exporter.yaml
