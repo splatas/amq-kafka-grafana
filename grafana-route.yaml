@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app: strimzi
+  name: grafana
+spec:
+  host: grafana-amq-kafka-test.apps-rp.cloudteco.com.ar
+  port:
+    targetPort: grafana
+  to:
+    kind: Service
+    name: grafana
+    weight: 100
+  wildcardPolicy: None
