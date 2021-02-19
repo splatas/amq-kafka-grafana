@@ -7,7 +7,6 @@ metadata:
   labels:
     app: strimzi
   name: grafana
-  namespace: amq-kafka-dev
   resourceVersion: '622317241'
 spec:
   progressDeadlineSeconds: 600
