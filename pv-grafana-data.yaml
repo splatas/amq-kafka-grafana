@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/glusterfs
+  finalizers:
+  - kubernetes.io/pvc-protection
+  name: pv-grafana-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: glusterfs-storage
+  volumeName: pvc-6b775592-72f4-11eb-aaab-005056b01184

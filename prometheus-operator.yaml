@@ -30,7 +30,7 @@ spec:
       containers:
         - args:
             - '--manage-crds=false'
-            - '--namespaces=amq-kafka-dev'
+            - '--namespaces=amq-kafka-test'
             - '--logtostderr=true'
             - '--config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1'
             - >-
