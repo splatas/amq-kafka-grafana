@@ -32,7 +32,13 @@ Instalación base en https://api-ocp-rp.cloudteco.com.ar/console/project/amq-kaf
         - oc create -f prometheus-route.yaml -n amq-kafka-test
         - oc create -f kafka-service-monitor.yaml -n amq-kafka-test
 
-3. Grafana. Genero un pv para almacenar la configuración (dashboards) de Grafana y lanzo la instalación:
+3. Kafka Exporter
+    - oc create -f kafka-cluster-kafka-exporter-certs.yaml -n amq-kafka-test
+    - oc create -f kafka-cluster-kafka-exporter-sa.yaml -n amq-kafka-test
+    - oc create -f kafka-cluster-kafka-exporter.yaml -n amq-kafka-test
+
+
+4. Grafana. Genero un pv para almacenar la configuración (dashboards) de Grafana y lanzo la instalación:
     - oc create -f pv-grafana-data.yaml -n amq-kafka-test
     - oc create -f grafana.yaml -n amq-kafka-test
     
@@ -40,10 +46,7 @@ Instalación base en https://api-ocp-rp.cloudteco.com.ar/console/project/amq-kaf
         - oc create -f grafana-svc.yaml -n amq-kafka-test
         - oc create -f grafana-route.yaml -n amq-kafka-test
 
-2.3. kafka-cluster-kafka-exporter.yaml
-
-
-4. Configuración de los Dashboards
+5. Configuración de los Dashboards
 Los json con los Dashboards predefinidos se encuentran en ./amq-streams-1.6.2-ocp-install-examples/examples/metrics/grafana-dashboards
     - strimzi-cruise-control.json
     - strimzi-kafka-bridge.json

@@ -13,7 +13,6 @@ metadata:
     strimzi.io/kind: Kafka
     strimzi.io/name: kafka-cluster-kafka-exporter
   name: kafka-cluster-kafka-exporter
-  namespace: amq-kafka-dev
   ownerReferences:
     - apiVersion: kafka.strimzi.io/v1beta1
       blockOwnerDeletion: false
@@ -117,24 +116,3 @@ spec:
           secret:
             defaultMode: 288
             secretName: kafka-cluster-cluster-ca-cert
-status:
-  availableReplicas: 1
-  conditions:
-    - lastTransitionTime: '2021-02-02T15:36:50Z'
-      lastUpdateTime: '2021-02-02T15:37:24Z'
-      message: >-
-        ReplicaSet "kafka-cluster-kafka-exporter-7466f78697" has successfully
-        progressed.
-      reason: NewReplicaSetAvailable
-      status: 'True'
-      type: Progressing
-    - lastTransitionTime: '2021-02-02T21:33:14Z'
-      lastUpdateTime: '2021-02-02T21:33:14Z'
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: 'True'
-      type: Available
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
