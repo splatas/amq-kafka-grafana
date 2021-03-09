@@ -1361,7 +1361,7 @@
         "multi": false,
         "name": "kubernetes_namespace",
         "options": [],
-        "query": "query_result(kafka_consumergroup_current_offset)",
+        "query": "query_result(kafka_server_replicamanager_leadercount)",
         "refresh": 1,
         "regex": "/.*namespace=\"([^\"]*).*/",
         "skipUrlSync": false,
