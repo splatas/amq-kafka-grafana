@@ -1,0 +1,43 @@
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":{"annotations":{},"labels":{"app":"strimzi"},"name":"prometheus-server"},"rules":[{"apiGroups":[""],"resources":["nodes","nodes/proxy","services","endpoints","pods"],"verbs":["get","list","watch"]},{"apiGroups":["extensions"],"resources":["ingresses"],"verbs":["get","list","watch"]},{"nonResourceURLs":["/metrics"],"verbs":["get"]}]}
+  creationTimestamp: "2021-01-29T14:21:49Z"
+  labels:
+    app: strimzi
+  name: prometheus-server
+  resourceVersion: "677805982"
+  selfLink: /apis/authorization.openshift.io/v1/clusterroles/prometheus-server
+  uid: 534c4df3-623d-11eb-a398-005056b0841c
+rules:
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - endpoints
+  - nodes
+  - nodes/proxy
+  - pods
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  attributeRestrictions: null
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: null
+  attributeRestrictions: null
+  nonResourceURLs:
+  - /metrics
+  resources: []
+  verbs:
+  - get

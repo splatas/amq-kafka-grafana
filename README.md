@@ -31,7 +31,10 @@ Instalación base en https://api-ocp-rp.cloudteco.com.ar/console/project/amq-kaf
         - oc create -f prometheus-svc.yaml -n amq-kafka-test
         - oc create -f prometheus-route.yaml -n amq-kafka-test
         - oc create -f kafka-service-monitor.yaml -n amq-kafka-test
-
+        
+        Asignarle el clusterrole 'prometheus-server' (prometheus-server-clusterrole.yaml) a la ServiceAccount del namespace (este ejemplo es de DEV)
+        - oc adm policy add-cluster-role-to-user prometheus-server system:serviceaccount:amq-kafka-dev:prometheus-server -n amq-kafka-dev 
+        
 3. Kafka Exporter
     - oc create -f kafka-cluster-kafka-exporter-certs.yaml -n amq-kafka-test
     - oc create -f kafka-cluster-kafka-exporter-sa.yaml -n amq-kafka-test
